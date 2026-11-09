@@ -1,0 +1,217 @@
+// Tang Primer 20K Dock: pins of kvm_top (sources: Dock 3714 schematic, Sipeed examples)
+
+// Clock 27 MHz
+IO_LOC "clk_27m" H11;
+IO_PORT "clk_27m" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+
+// K0: global reset, 3.3 V
+IO_LOC "key0_n" T10;
+IO_PORT "key0_n" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+
+// UART to BL702 (USB COM port), pins from Sipeed UART example
+IO_LOC "uart_tx" M11;
+IO_PORT "uart_tx" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "uart_rx" T13;
+IO_PORT "uart_rx" IO_TYPE=LVCMOS33 PULL_MODE=NONE;
+
+// CPU GPIO bits 0..5: LED0..LED5, active low. C13 = DONE, A13 = READY (dual-purpose as GPIO)
+IO_LOC "gpio[0]" C13;
+IO_PORT "gpio[0]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "gpio[1]" A13;
+IO_PORT "gpio[1]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "gpio[2]" N16;
+IO_PORT "gpio[2]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "gpio[3]" N14;
+IO_PORT "gpio[3]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "gpio[4]" L14;
+IO_PORT "gpio[4]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "gpio[5]" L16;
+IO_PORT "gpio[5]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+
+// K1..K3 (T3, T2, D7) and DIP SW0..SW4 (C7, E9, E8, T4, T5) are NOT used: each is the [B] half of an
+// IO pair whose [A] half is a DDR3 pin, and the DDR3 PHY serializers occupy both halves
+// (Gowin PR2034 "location has already been used").
+
+// HDMI input: Sipeed PMOD_DVI module in PMOD J6 (Dock HDMI connector is not used: no 50R RX termination).
+// True LVDS pairs of J6 (SoM 3961 schematic): C12/B12 = IOL7A/B, B13/A14 = IOL8A/B, B14/A15 = IOL2A/B,
+// D14/E15 = IOT44A/B. Module wiring: CKP C12, CKN B12 - clock polarity is direct;
+// data pairs have P on the [B] pin (D0P A14, D1P A15, D2P E15) -> the receiver must invert the data.
+// Bank 7, VCCIO 3.3 V: LVDS25 input is allowed at VCCIO 3.3 V (GW2A datasheet table 2-2).
+IO_LOC "tmds_clk_p" C12,B12;
+IO_PORT "tmds_clk_p" IO_TYPE=LVDS25 PULL_MODE=NONE;
+// data: port _p is on the [A] pin = module DxN (polarity inverted, corrected in hdmi_rx.sv)
+IO_LOC "tmds_d_p[0]" B13,A14;
+IO_PORT "tmds_d_p[0]" IO_TYPE=LVDS25 PULL_MODE=NONE;
+IO_LOC "tmds_d_p[1]" B14,A15;
+IO_PORT "tmds_d_p[1]" IO_TYPE=LVDS25 PULL_MODE=NONE;
+IO_LOC "tmds_d_p[2]" D14,E15;
+IO_PORT "tmds_d_p[2]" IO_TYPE=LVDS25 PULL_MODE=NONE;
+
+// PMOD_DVI DDC/HPD by wires to PMOD J5 (3.3 V levels on the module, pull-ups on the module):
+// SCL A11, SDA N6 (EDID, I2C slave 0x50, open drain), HPD N9 (output)
+IO_LOC "hdmi_scl" A11;
+IO_PORT "hdmi_scl" IO_TYPE=LVCMOS33 PULL_MODE=NONE;
+IO_LOC "hdmi_sda" N6;
+IO_PORT "hdmi_sda" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8;
+IO_LOC "hdmi_hpd" N9;
+IO_PORT "hdmi_hpd" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8;
+
+// Ethernet RTL8201F, RMII (pins: Dock schematic P005, Sipeed Ethernet example).
+// RXD0/RXD1/CRS_DV/RXER are PHY strap pins with board resistors -> no FPGA pull.
+IO_LOC "eth_ref_clk" A9;
+IO_PORT "eth_ref_clk" IO_TYPE=LVCMOS33 PULL_MODE=NONE;
+IO_LOC "eth_rxd[0]" F15;
+IO_PORT "eth_rxd[0]" IO_TYPE=LVCMOS33 PULL_MODE=NONE;
+IO_LOC "eth_rxd[1]" C9;
+IO_PORT "eth_rxd[1]" IO_TYPE=LVCMOS33 PULL_MODE=NONE;
+IO_LOC "eth_crs_dv" M6;
+IO_PORT "eth_crs_dv" IO_TYPE=LVCMOS33 PULL_MODE=NONE;
+IO_LOC "eth_rx_er" L8;
+IO_PORT "eth_rx_er" IO_TYPE=LVCMOS33 PULL_MODE=NONE;
+IO_LOC "eth_txd[0]" D16;
+IO_PORT "eth_txd[0]" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8;
+IO_LOC "eth_txd[1]" E14;
+IO_PORT "eth_txd[1]" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8;
+IO_LOC "eth_tx_en" E16;
+IO_PORT "eth_tx_en" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8;
+IO_LOC "eth_rst_n" F10;
+IO_PORT "eth_rst_n" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8;
+
+// Ethernet MDC/MDIO (shared with HDMI DDC via 2N7002 level shifters, 1.5k pull-ups on the FPGA side)
+IO_LOC "eth_mdc" F14;
+IO_PORT "eth_mdc" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "eth_mdio" F16;
+IO_PORT "eth_mdio" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+
+// DDR3 H5TQ1G63EFR on the SoM (pins: Sipeed DDR-test / Cam2HDMI ddr3 .cst), bank VCCIO 1.5 V
+// ddr_addr[13] = C8 exists only for DDR_ROW_BITS=14 (2 Gbit parts)
+//IO_LOC "ddr_addr[13]" C8;
+//IO_PORT "ddr_addr[13]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_addr[12]" A3;
+IO_PORT "ddr_addr[12]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_addr[11]" B7;
+IO_PORT "ddr_addr[11]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_addr[10]" K3;
+IO_PORT "ddr_addr[10]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_addr[9]" F9;
+IO_PORT "ddr_addr[9]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_addr[8]" A5;
+IO_PORT "ddr_addr[8]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_addr[7]" D8;
+IO_PORT "ddr_addr[7]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_addr[6]" B1;
+IO_PORT "ddr_addr[6]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_addr[5]" E6;
+IO_PORT "ddr_addr[5]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_addr[4]" C4;
+IO_PORT "ddr_addr[4]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_addr[3]" F8;
+IO_PORT "ddr_addr[3]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_addr[2]" D6;
+IO_PORT "ddr_addr[2]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_addr[1]" A4;
+IO_PORT "ddr_addr[1]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_addr[0]" F7;
+IO_PORT "ddr_addr[0]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_ba[2]" H5;
+IO_PORT "ddr_ba[2]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_ba[1]" D3;
+IO_PORT "ddr_ba[1]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_ba[0]" H4;
+IO_PORT "ddr_ba[0]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_cs_n" P5;
+IO_PORT "ddr_cs_n" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_ras_n" R4;
+IO_PORT "ddr_ras_n" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_cas_n" R6;
+IO_PORT "ddr_cas_n" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_we_n" L2;
+IO_PORT "ddr_we_n" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_cke" J2;
+IO_PORT "ddr_cke" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_odt" R3;
+IO_PORT "ddr_odt" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_reset_n" B9;
+IO_PORT "ddr_reset_n" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_dm[1]" K5;
+IO_PORT "ddr_dm[1]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_dm[0]" G1;
+IO_PORT "ddr_dm[0]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_ck" J1,J3;
+IO_PORT "ddr_ck" IO_TYPE=SSTL15D PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_dq[15]" M2;
+IO_PORT "ddr_dq[15]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 VREF=INTERNAL BANK_VCCIO=1.5;
+IO_LOC "ddr_dq[14]" R1;
+IO_PORT "ddr_dq[14]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 VREF=INTERNAL BANK_VCCIO=1.5;
+IO_LOC "ddr_dq[13]" H3;
+IO_PORT "ddr_dq[13]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 VREF=INTERNAL BANK_VCCIO=1.5;
+IO_LOC "ddr_dq[12]" P4;
+IO_PORT "ddr_dq[12]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 VREF=INTERNAL BANK_VCCIO=1.5;
+IO_LOC "ddr_dq[11]" L1;
+IO_PORT "ddr_dq[11]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 VREF=INTERNAL BANK_VCCIO=1.5;
+IO_LOC "ddr_dq[10]" N2;
+IO_PORT "ddr_dq[10]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 VREF=INTERNAL BANK_VCCIO=1.5;
+IO_LOC "ddr_dq[9]" K4;
+IO_PORT "ddr_dq[9]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 VREF=INTERNAL BANK_VCCIO=1.5;
+IO_LOC "ddr_dq[8]" M3;
+IO_PORT "ddr_dq[8]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 VREF=INTERNAL BANK_VCCIO=1.5;
+IO_LOC "ddr_dq[7]" B3;
+IO_PORT "ddr_dq[7]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 VREF=INTERNAL BANK_VCCIO=1.5;
+IO_LOC "ddr_dq[6]" E1;
+IO_PORT "ddr_dq[6]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 VREF=INTERNAL BANK_VCCIO=1.5;
+IO_LOC "ddr_dq[5]" C1;
+IO_PORT "ddr_dq[5]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 VREF=INTERNAL BANK_VCCIO=1.5;
+IO_LOC "ddr_dq[4]" E2;
+IO_PORT "ddr_dq[4]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 VREF=INTERNAL BANK_VCCIO=1.5;
+IO_LOC "ddr_dq[3]" F3;
+IO_PORT "ddr_dq[3]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 VREF=INTERNAL BANK_VCCIO=1.5;
+IO_LOC "ddr_dq[2]" F4;
+IO_PORT "ddr_dq[2]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 VREF=INTERNAL BANK_VCCIO=1.5;
+IO_LOC "ddr_dq[1]" F5;
+IO_PORT "ddr_dq[1]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 VREF=INTERNAL BANK_VCCIO=1.5;
+IO_LOC "ddr_dq[0]" G5;
+IO_PORT "ddr_dq[0]" IO_TYPE=SSTL15 PULL_MODE=NONE DRIVE=8 VREF=INTERNAL BANK_VCCIO=1.5;
+IO_LOC "ddr_dqs[1]" J5,K6;
+IO_PORT "ddr_dqs[1]" IO_TYPE=SSTL15D PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+IO_LOC "ddr_dqs[0]" G2,G3;
+IO_PORT "ddr_dqs[0]" IO_TYPE=SSTL15D PULL_MODE=NONE DRIVE=8 BANK_VCCIO=1.5;
+
+// PLL sites (SUG935 A.3, INS_LOC ... PLL_L[n]/PLL_R). Without them the placer distributes the 3 rPLLs
+// differently from build to build, and DDR3 calibration depends on the placement.
+//  - DVI RX: its clock input C12/B12 is the dedicated input of LPLL1 (pin report); elsewhere it is routed
+//    by generic routing (PR1014 "Generic routing resource will be used to clock signal HDMI_CLK").
+//  - DDR3 memory clock: LPLL2, its dedicated pins (F7/E8, C4/B5) are in bank 6 among the DDR3 lines.
+//  - core: input from the global clock pin H11, any site; right side.
+// Mapping PLL_L[0]/PLL_L[1] <-> LPLL1/LPLL2 is not documented: if PR1014 is still in the P&R log,
+// swap PLL_L[0] and PLL_L[1] below.
+INS_LOC "u_dvi_rx/dvi2rgb_inst/rPLL_inst" PLL_L[0];
+INS_LOC "u_pll_ddr/rpll_inst" PLL_L[1];
+INS_LOC "u_clk_rst/u_pll/rpll_inst" PLL_R;
+
+// USB3317 (ULPI) on the Dock -> USB-C to the remote PC (pins: Sipeed TangPrimer-20K-example usb_cdc .cst).
+// RESETB of USB3317 = F10 (eth_rst_n, shared with RTL8201F). SW2 on the Dock: DEVICE.
+IO_LOC "ulpi_clk" T15;
+// CLKOUT of USB3317 is high-Z while its RESETB = 0: weak pull-down so the clock input does not float
+IO_PORT "ulpi_clk" IO_TYPE=LVCMOS33 PULL_MODE=DOWN;
+IO_LOC "ulpi_dir" K12;
+IO_PORT "ulpi_dir" IO_TYPE=LVCMOS33 PULL_MODE=NONE;
+IO_LOC "ulpi_nxt" K13;
+IO_PORT "ulpi_nxt" IO_TYPE=LVCMOS33 PULL_MODE=NONE;
+IO_LOC "ulpi_stp" K11;
+IO_PORT "ulpi_stp" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8;
+IO_LOC "ulpi_data[0]" G11;
+IO_LOC "ulpi_data[1]" H12;
+IO_LOC "ulpi_data[2]" J12;
+IO_LOC "ulpi_data[3]" H13;
+IO_LOC "ulpi_data[4]" T14;
+IO_LOC "ulpi_data[5]" R13;
+IO_LOC "ulpi_data[6]" P13;
+IO_LOC "ulpi_data[7]" R12;
+IO_PORT "ulpi_data[0]" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8;
+IO_PORT "ulpi_data[1]" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8;
+IO_PORT "ulpi_data[2]" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8;
+IO_PORT "ulpi_data[3]" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8;
+IO_PORT "ulpi_data[4]" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8;
+IO_PORT "ulpi_data[5]" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8;
+IO_PORT "ulpi_data[6]" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8;
+IO_PORT "ulpi_data[7]" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8;

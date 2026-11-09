@@ -1,0 +1,84 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Настройка: инструменты",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/setup.ps1"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Настройка: сеть ПК",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/pc-net-setup.ps1"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Сборка",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/build.ps1"
+      ],
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Сборка прошивки ядра (без синтеза)",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/build.ps1",
+        "-FirmwareOnly"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Прошивка платы",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/flash.ps1"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Сборка и прошивка платы",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "Сборка",
+        "Прошивка платы"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}

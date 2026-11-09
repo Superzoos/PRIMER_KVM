@@ -1,0 +1,54 @@
+/* kvm.ld.in -> build/kvm.ld (configure_file в CMakeLists.txt).
+ * Режим BUILD_LOAD: код, константы и начальные значения .data - в ITCM
+ * (попадают туда из битстрима через merge_bit), переменные и стек - в DTCM.
+ * Адреса ITCM/DTCM - из sections.lds SDK Gowin_PicoRV32. */
+MEMORY
+{
+    ITCM (rx) : ORIGIN = 0x02000000, LENGTH = @CPU_ITCM_KB@K
+    DTCM (rw) : ORIGIN = 0x01000000, LENGTH = @CPU_DTCM_KB@K
+}
+
+/* Минимум свободной DTCM под стек (указатель стека выставляет аппаратный сброс ядра) */
+STACK_MIN = 1024;
+
+ENTRY(start)
+
+SECTIONS
+{
+    .text :
+    {
+        /* reset_vec из start.S - строго первым: с начала ITCM ядро стартует после сброса.
+           (В sections.lds SDK первым шёл .text.startup, куда GCC кладёт main.) */
+        KEEP(*start.S.o*(.text))
+        *(.text.unlikely .text.unlikely.*)
+        *(.text.startup .text.startup.*)
+        *(.text .text.*)
+        *(.rodata .rodata.* .srodata .srodata.*)
+        . = ALIGN(4);
+        _etext = .;
+    } > ITCM
+
+    .data :
+    {
+        . = ALIGN(4);
+        _sdata = .;
+        *(.data .data.* .sdata .sdata.*)
+        . = ALIGN(4);
+        _edata = .;
+    } > DTCM AT > ITCM
+    _sidata = LOADADDR(.data);
+
+    .bss (NOLOAD) :
+    {
+        . = ALIGN(4);
+        _sbss = .;
+        *(.bss .bss.* .sbss .sbss.* COMMON)
+        . = ALIGN(4);
+        _ebss = .;
+    } > DTCM
+    _heap_start = .;
+
+    ASSERT(ORIGIN(DTCM) + LENGTH(DTCM) - _ebss >= STACK_MIN, "DTCM: не осталось места под стек")
+
+    /DISCARD/ : { *(.comment) *(.note*) *(.eh_frame*) *(.riscv.attributes) }
+}

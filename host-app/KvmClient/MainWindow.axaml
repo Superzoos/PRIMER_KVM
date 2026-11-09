@@ -1,0 +1,37 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="KvmClient.MainWindow"
+        Title="PRIMER KVM" Width="1100" Height="760" MinWidth="640" MinHeight="420">
+    <Grid x:Name="RootGrid" RowDefinitions="Auto,*,Auto,90" Margin="10">
+        <!-- подключение -->
+        <Grid x:Name="TopBar" Grid.Row="0" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*,Auto">
+            <TextBlock Grid.Column="0" Text="IP:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+            <TextBox Grid.Column="1" x:Name="IpBox" Width="140" Text="192.168.50.10"/>
+            <TextBlock Grid.Column="2" Text="Порт:" VerticalAlignment="Center" Margin="12,0,6,0"/>
+            <TextBox Grid.Column="3" x:Name="PortBox" Width="70" Text="50000"/>
+            <Button Grid.Column="4" x:Name="ConnectButton" Content="Подключиться" Margin="12,0,0,0" Click="OnConnectClick"/>
+            <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="6" Margin="12,0,0,0">
+                <Ellipse x:Name="StatusDot" Width="12" Height="12" Fill="Gray" VerticalAlignment="Center"/>
+                <TextBlock x:Name="StatusText" Text="не подключено" VerticalAlignment="Center"/>
+            </StackPanel>
+            <TextBlock Grid.Column="7" Text="Ctrl+Alt+Q - управление удалённым ПК" Foreground="Gray"
+                       VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- изображение удалённого ПК -->
+        <Border x:Name="VideoBorder" Grid.Row="1" Margin="0,10,0,0" Background="#505050" BorderBrush="Gray"
+                BorderThickness="1">
+            <Grid>
+                <Image x:Name="FrameImage" Stretch="Uniform" IsVisible="False"/>
+                <TextBlock x:Name="NoVideoText" Text="Нет связи" Foreground="#E0E0E0" FontSize="28"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- состояние -->
+        <TextBlock x:Name="InfoText" Grid.Row="2" Margin="0,8,0,0" Foreground="Gray" TextTrimming="CharacterEllipsis"/>
+
+        <!-- события -->
+        <ListBox x:Name="LogList" Grid.Row="3" Margin="0,8,0,0" FontSize="12"/>
+    </Grid>
+</Window>

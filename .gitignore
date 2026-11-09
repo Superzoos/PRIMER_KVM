@@ -1,0 +1,19 @@
+# Результаты сборки
+board/fpga/impl/
+board/fpga/ip/
+board/fpga/*.gprj
+board/fpga/*.gprj.user
+board/firmware/build/
+host-app/**/bin/
+host-app/**/obj/
+host-app/publish/
+
+# Инструменты (ставит scripts/setup.ps1)
+board/tools/
+
+# Среды разработки
+.vs/
+*.user
+
+# Настройки VS Code для корня репозитория (создаются автоматически)
+/.vscode/
